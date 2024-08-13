@@ -305,7 +305,7 @@ namespace Ticket_bonito
 			string fechaA = dateTimePicker3.Value.ToString("yyyy-MM-dd");
 			string fechaB = dateTimePicker4.Value.ToString("yyyy-MM-dd");
 
-			await Task.Run(() => tickets = conn.GetTicketsHeader($@"select DISTINCT ven.fec_doc, ven.ref_doc, cli.NOM_CLI, hora_reg, concat('$',round(tot_doc,2)), ven.COD_USU, ren.cod_ven
+			await Task.Run(() => tickets = conn.GetTicketsHeader($@"select DISTINCT ven.fec_doc, ven.ref_doc, cli.NOM_CLI, hora_reg, round(tot_doc,2), ven.COD_USU, ren.cod_ven
 												from tblgralventas ven
 												inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI
 												inner join tblrenventas ren on ren.REF_DOC=ven.REF_DOC
@@ -391,7 +391,7 @@ namespace Ticket_bonito
 							table.AddCell(dataCell);
 							dataCell = new PdfPCell(new Phrase($"{r[3]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
 							table.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"{r[4]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
+							dataCell = new PdfPCell(new Phrase($"${Convert.ToDouble(r[4]):N2}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
 							table.AddCell(dataCell);
 							dataCell = new PdfPCell(new Phrase($"${0}.00", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
 							table.AddCell(dataCell);
@@ -408,9 +408,9 @@ namespace Ticket_bonito
 							table.AddCell(dataCell);
 							dataCell = new PdfPCell(new Phrase($"{r[3]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = new BaseColor(230, 133, 138) };
 							table.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"{r[4]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = new BaseColor(230, 133, 138) };
+							dataCell = new PdfPCell(new Phrase($"${Convert.ToDouble(r[4]):N2}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = new BaseColor(230, 133, 138) };
 							table.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"${ro.Split(',')[1]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = new BaseColor(230, 133, 138) };
+							dataCell = new PdfPCell(new Phrase($"${Convert.ToDouble(ro.Split(',')[1]):N2}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = new BaseColor(230, 133, 138) };
 							table.AddCell(dataCell);
 						}
 
@@ -427,9 +427,9 @@ namespace Ticket_bonito
 					}
 
 
-					doc.Add(new Paragraph($"Subtotal: ${subtotal}", titleFont) { Alignment = Element.ALIGN_RIGHT });
-					doc.Add(new Paragraph($"Devoluciones: ${devTotal}", titleFont) { Alignment = Element.ALIGN_RIGHT });
-					doc.Add(new Paragraph($"Total: ${subtotal - devTotal}", titleFont) { Alignment = Element.ALIGN_RIGHT });
+					doc.Add(new Paragraph($"Subtotal: ${Convert.ToDouble(subtotal):N2}", titleFont) { Alignment = Element.ALIGN_RIGHT });
+					doc.Add(new Paragraph($"Devoluciones: ${Convert.ToDouble(devTotal):N2}", titleFont) { Alignment = Element.ALIGN_RIGHT });
+					doc.Add(new Paragraph($"Total: ${Convert.ToDouble(subtotal - devTotal):N2}", titleFont) { Alignment = Element.ALIGN_RIGHT });
 
 					doc.Close();
 					writer.Close();
