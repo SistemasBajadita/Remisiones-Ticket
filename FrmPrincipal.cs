@@ -35,7 +35,7 @@ namespace Ticket_bonito
 			string filter = TxtFiltro.Text;
 			string dateA = dateTimePicker1.Value.ToString("yyyy-MM-dd");
 			string dateB = dateTimePicker2.Value.ToString("yyyy-MM-dd");
-			string query = $@"select ven.fec_doc as Fecha,ven.ref_doc as Folio,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago,CASE 
+			string query = $@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Folio,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago,CASE 
 								   WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado'
 								   ELSE 'Aplicado'
 							   END AS Estado
@@ -241,13 +241,16 @@ namespace Ticket_bonito
 		{
 			Task.Run(() =>
 			{
-				Invoke(new Action(() => { reporte.DataSource = conn.GetTicketsHeader($"select ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado' ELSE 'Aplicado' END AS Estado" +
+				Invoke(new Action(() =>
+				{
+					reporte.DataSource = conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado' ELSE 'Aplicado' END AS Estado" +
 					$" from tblgralventas ven " +
 					$"inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI " +
 					$" inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC " +
 					$"inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP " +
 					$" left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc " +
-					$"where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}' "); }));
+					$"where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}' ");
+				}));
 			});
 		}
 
@@ -256,7 +259,7 @@ namespace Ticket_bonito
 			label1.Visible = true;
 			await Task.Run(() =>
 			{
-				Invoke(new Action(() => { reporte.DataSource = conn.GetTicketsHeader($@"select ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE 
+				DataTable result = conn.GetTicketsHeader($@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE 
 																							   WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado'
 																							   ELSE 'Aplicado'
 																						   END AS Estado
@@ -265,7 +268,11 @@ namespace Ticket_bonito
 																						inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC
 																						inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP
 																						left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc
-																						where CAJA_DOC=9 and ven.fec_doc='{DateTime.Now:yyyy-MM-dd}'"); }));
+																						where CAJA_DOC=9 and ven.fec_doc='{DateTime.Now:yyyy-MM-dd}'");
+				Invoke(new Action(() =>
+				{
+					reporte.DataSource = result;
+				}));
 			});
 			label1.Visible = false;
 
@@ -440,11 +447,6 @@ namespace Ticket_bonito
 			{
 				MessageBox.Show(ex.Message, "La Bajadita - Venta de Frutas y Verduras");
 			}
-		}
-
-		private void tabPage1_Click(object sender, EventArgs e)
-		{
-
 		}
 	}
 }
