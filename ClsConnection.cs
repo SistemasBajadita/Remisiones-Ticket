@@ -22,11 +22,12 @@ namespace Ticket_bonito
 				con.Open();
 
 				MySqlCommand cmd = new MySqlCommand(query, con);
-				MySqlDataReader rd = cmd.ExecuteReader();
+				var rd = cmd.ExecuteScalar();
 
-				if (rd.Read())
+				if (rd!=null)
 				{
-					return $"{rd.GetString(0)}, {rd.GetDecimal(1)}";
+					con.Close();
+					return rd.ToString();
 				}
 			}
 			catch (Exception ex)
@@ -37,7 +38,6 @@ namespace Ticket_bonito
 			{
 				con.Close();
 			}
-
 			return "";
 		}
 
