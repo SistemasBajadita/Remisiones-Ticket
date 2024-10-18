@@ -214,10 +214,13 @@ namespace Ticket_bonito
                         query = $"select ven.NOM_VEN from tblrenventas ren inner join tblvendedores ven on ven.cod_ven = ren.cod_ven where ref_doc='{row.Cells[1].Value}' limit 1;";
                         string vendedor = conn.GetValueFromDataBase(query);
 
+                        query = $"select usu.NOM_USU from tblgralventas ven inner join tblusuarios usu on usu.COD_USU=ven.cod_usu where ven.REF_DOC='{row.Cells[1].Value}';";
+                        string cajero = conn.GetValueFromDataBase(query);
+
                         ClsLetras letras = new ClsLetras();
                         string l = letras.NumberToWords(Convert.ToDecimal(total));
 
-                        FooterPageEventHelper footerEventHelper = new FooterPageEventHelper(subtotal, impuesto, total, vendedor, l);
+                        FooterPageEventHelper footerEventHelper = new FooterPageEventHelper(subtotal, impuesto, total, vendedor, l, cajero);
                         writer.PageEvent = footerEventHelper;
 
                         doc.Close();
@@ -316,12 +319,12 @@ namespace Ticket_bonito
             string fechaB = dateTimePicker4.Value.ToString("yyyy-MM-dd");
 
             await Task.Run(() => tickets = conn.GetTicketsHeader($@"select DISTINCT ven.fec_doc, ven.ref_doc, cli.NOM_CLI, hora_reg, round(tot_doc,2), ven.COD_USU, ren.cod_ven
-												from tblgralventas ven
-												inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI
-												inner join tblrenventas ren on ren.REF_DOC=ven.REF_DOC
-												where CAJA_DOC=9 
-												and (ven.FEC_DOC between '{fechaA}' and '{fechaB}')
-												and ren.cod_ven='{cod}';"));
+												                    from tblgralventas ven
+												                    inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI
+												                    inner join tblrenventas ren on ren.REF_DOC=ven.REF_DOC
+												                    where CAJA_DOC=9 
+												                    and (ven.FEC_DOC between '{fechaA}' and '{fechaB}')
+												                    and ren.cod_ven='{cod}';"));
 
             try
             {
@@ -387,23 +390,31 @@ namespace Ticket_bonito
                         query = $@" select round( SUM(tot_dev),2)
 									from tblencdevolucion dev
 									inner join tblgralventas ven on dev.REF_DOC=ven.REF_DOC
-									where dev.REF_DOC='{r[1]}' and cod_sts=5; ";
+									where dev.REF_DOC='{r[1]}' and cod_sts=5;";
 
                         string ro = conn.GetRowQuery(query);
 
+                        bool creditFlag = false;
+
+                        if (conn.GetValueFromDataBase($"select cod_frp from tblauxcaja where ref_doc = '{r[1]}'") == "5")
+                        {
+                            creditFlag = true;
+                        }
+
+
                         if (ro == "")
                         {
-                            dataCell = new PdfPCell(new Phrase($"{Convert.ToDateTime(r[0]):dd/MM/yyyy}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 5f };
+                            dataCell = new PdfPCell(new Phrase($"{Convert.ToDateTime(r[0]):dd/MM/yyyy}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 5f, BackgroundColor = creditFlag ? new BaseColor(255, 255, 0) : new BaseColor(255, 255, 255) };
                             table.AddCell(dataCell);
-                            dataCell = new PdfPCell(new Phrase($"{r[1]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
+                            dataCell = new PdfPCell(new Phrase($"{r[1]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = creditFlag ? new BaseColor(255, 255, 0) : new BaseColor(255, 255, 255) };
                             table.AddCell(dataCell);
-                            dataCell = new PdfPCell(new Phrase($"{r[2]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
+                            dataCell = new PdfPCell(new Phrase($"{r[2]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = creditFlag ? new BaseColor(255, 255, 0) : new BaseColor(255, 255, 255) };
                             table.AddCell(dataCell);
-                            dataCell = new PdfPCell(new Phrase($"{r[3]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
+                            dataCell = new PdfPCell(new Phrase($"{r[3]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = creditFlag ? new BaseColor(255, 255, 0) : new BaseColor(255, 255, 255) };
                             table.AddCell(dataCell);
-                            dataCell = new PdfPCell(new Phrase($"${Convert.ToDouble(r[4]):N2}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
+                            dataCell = new PdfPCell(new Phrase($"${Convert.ToDouble(r[4]):N2}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = creditFlag ? new BaseColor(255, 255, 0) : new BaseColor(255, 255, 255) };
                             table.AddCell(dataCell);
-                            dataCell = new PdfPCell(new Phrase($"${0}.00", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f };
+                            dataCell = new PdfPCell(new Phrase($"${0}.00", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = creditFlag ? new BaseColor(255, 255, 0) : new BaseColor(255, 255, 255) };
                             table.AddCell(dataCell);
                         }
                         else
@@ -423,23 +434,40 @@ namespace Ticket_bonito
                             dataCell = new PdfPCell(new Phrase($"${Convert.ToDouble(ro):N2}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 2f, BackgroundColor = new BaseColor(230, 133, 138) };
                             table.AddCell(dataCell);
                         }
-
-
                     }
 
                     double subtotal = 0;
+                    double credito = 0;
 
                     doc.Add(table);
 
                     foreach (DataRow r in tickets.Rows)
                     {
+                        query = $"select cod_frp from tblauxcaja where ref_doc = '{r[1]}'";
+                        if (conn.GetValueFromDataBase(query) == "5")
+                        {
+                            credito += double.Parse(r[4].ToString());
+                        }
                         subtotal += double.Parse(r[4].ToString());
                     }
 
+                    doc.Add(new Paragraph(Environment.NewLine));
+
+                    PdfPTable colores = new PdfPTable(1)
+                    {
+                        WidthPercentage = 20,
+                        HorizontalAlignment = Element.ALIGN_RIGHT
+                    };
+                    colores.AddCell(new PdfPCell(new Phrase("Devolucion")) { BackgroundColor = new BaseColor(230, 133, 138) });
+                    colores.AddCell(new PdfPCell(new Phrase("Credito")) { BackgroundColor = new BaseColor(255, 255, 0) });
+                    doc.Add(colores);
 
                     doc.Add(new Paragraph($"Subtotal: ${Convert.ToDouble(subtotal):N2}", titleFont) { Alignment = Element.ALIGN_RIGHT });
+                    doc.Add(new Paragraph($"Credito: ${credito:N2}", titleFont) { Alignment = Element.ALIGN_RIGHT });
                     doc.Add(new Paragraph($"Devoluciones: ${Convert.ToDouble(devTotal):N2}", titleFont) { Alignment = Element.ALIGN_RIGHT });
-                    doc.Add(new Paragraph($"Total: ${Convert.ToDouble(subtotal - devTotal):N2}", titleFont) { Alignment = Element.ALIGN_RIGHT });
+                    doc.Add(new Paragraph($"Total a entregar: ${Convert.ToDouble(subtotal - devTotal - credito):N2}\n\n", titleFont) { Alignment = Element.ALIGN_RIGHT });
+
+                    
 
                     doc.Close();
                     writer.Close();

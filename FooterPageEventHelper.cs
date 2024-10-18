@@ -13,16 +13,18 @@ namespace Ticket_bonito
 		private string _subtotal;
 		private string _impuesto;
 		private string _total;
+		private string _cajero;
 		private string _vendedor;
 		private string _letras;
 
-		public FooterPageEventHelper(string subtotal, string impuesto, string total,string vendedor, string letras)
+		public FooterPageEventHelper(string subtotal, string impuesto, string total,string vendedor, string letras, string cajero)
 		{
 			_subtotal = subtotal;
 			_impuesto = impuesto;
 			_total = total;
 			_vendedor = vendedor;
 			_letras = letras;
+			_cajero = cajero;
 		}
 
 		public override void OnEndPage(PdfWriter writer, Document document)
@@ -44,10 +46,13 @@ namespace Ticket_bonito
 			cell = new PdfPCell(new Paragraph($"Total: ${_total}", titleFont)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_RIGHT, PaddingBottom = 5f };
 			footer.AddCell(cell);
 
-			cell = new PdfPCell(new Paragraph($"Chofer: {_vendedor}", titleFont)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 5f };
+            cell = new PdfPCell(new Paragraph($"Nota realizada por: {_cajero}", titleFont)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 5f };
+            footer.AddCell(cell);
+
+            cell = new PdfPCell(new Paragraph($"Chofer: {_vendedor}", titleFont)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 5f };
 			footer.AddCell(cell);
 
-			cell = new PdfPCell(new Paragraph($"\n\n{_letras}", titleFont)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 5f };
+			cell = new PdfPCell(new Paragraph($"\n{_letras}", titleFont)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 5f };
 			footer.AddCell(cell);
 
 			footer.WriteSelectedRows(0, -1, document.LeftMargin, document.BottomMargin + 100, writer.DirectContent);
