@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
@@ -48,12 +45,12 @@ namespace Ticket_bonito
 			ad = new MySqlDataAdapter(cmd);
 		}
 
-		public DataTable GetTicketsHeader(string command)
+		public async Task<DataTable> GetTicketsHeader(string command)
 		{
 			DataTable tickets = new DataTable();
 			try
 			{
-				con.Open();
+				await con.OpenAsync();
 				cmd.CommandText = command;
 				cmd.ExecuteNonQuery();
 				ad.Fill(tickets);
@@ -64,7 +61,7 @@ namespace Ticket_bonito
 			}
 			finally
 			{
-				con.Close();
+				await con.CloseAsync();
 			}
 			return tickets;
 		}
