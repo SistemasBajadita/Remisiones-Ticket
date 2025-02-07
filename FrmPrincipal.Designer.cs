@@ -30,9 +30,9 @@ namespace Ticket_bonito
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.TabPages = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.label1 = new System.Windows.Forms.Label();
@@ -49,10 +49,17 @@ namespace Ticket_bonito
 			this.label3 = new System.Windows.Forms.Label();
 			this.cmbVendedor = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
+			this.tabPage3 = new System.Windows.Forms.TabPage();
+			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.label5 = new System.Windows.Forms.Label();
+			this.cmbVendedorChange = new System.Windows.Forms.ComboBox();
+			this.label6 = new System.Windows.Forms.Label();
+			this.button1 = new System.Windows.Forms.Button();
 			this.TabPages.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.reporte)).BeginInit();
 			this.tabPage2.SuspendLayout();
+			this.tabPage3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// TabPages
@@ -60,12 +67,13 @@ namespace Ticket_bonito
 			this.TabPages.Appearance = System.Windows.Forms.TabAppearance.Buttons;
 			this.TabPages.Controls.Add(this.tabPage1);
 			this.TabPages.Controls.Add(this.tabPage2);
+			this.TabPages.Controls.Add(this.tabPage3);
 			this.TabPages.Font = new System.Drawing.Font("Century", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.TabPages.HotTrack = true;
 			this.TabPages.Location = new System.Drawing.Point(12, 12);
 			this.TabPages.Name = "TabPages";
 			this.TabPages.SelectedIndex = 0;
-			this.TabPages.Size = new System.Drawing.Size(1212, 482);
+			this.TabPages.Size = new System.Drawing.Size(1297, 482);
 			this.TabPages.TabIndex = 0;
 			// 
 			// tabPage1
@@ -80,7 +88,7 @@ namespace Ticket_bonito
 			this.tabPage1.Location = new System.Drawing.Point(4, 35);
 			this.tabPage1.Name = "tabPage1";
 			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(1204, 443);
+			this.tabPage1.Size = new System.Drawing.Size(1289, 443);
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "Imprimir ticket";
 			// 
@@ -88,7 +96,7 @@ namespace Ticket_bonito
 			// 
 			this.label1.AutoSize = true;
 			this.label1.Font = new System.Drawing.Font("Century", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(73, 373);
+			this.label1.Location = new System.Drawing.Point(94, 373);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(145, 21);
 			this.label1.TabIndex = 21;
@@ -127,43 +135,44 @@ namespace Ticket_bonito
 			// reporte
 			// 
 			this.reporte.AllowUserToAddRows = false;
-			dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(245)))), ((int)(((byte)(196)))));
-			dataGridViewCellStyle4.Font = new System.Drawing.Font("Lucida Fax", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Navy;
-			this.reporte.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
+			dataGridViewCellStyle19.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(245)))), ((int)(((byte)(196)))));
+			dataGridViewCellStyle19.Font = new System.Drawing.Font("Lucida Fax", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle19.ForeColor = System.Drawing.Color.Navy;
+			this.reporte.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle19;
 			this.reporte.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.reporte.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
 			this.reporte.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
 			this.reporte.BackgroundColor = System.Drawing.Color.Linen;
 			this.reporte.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Sunken;
-			dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(78)))), ((int)(((byte)(80)))));
-			dataGridViewCellStyle5.Font = new System.Drawing.Font("Century", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle5.ForeColor = System.Drawing.Color.White;
-			dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-			dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-			dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-			this.reporte.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+			dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle20.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(78)))), ((int)(((byte)(80)))));
+			dataGridViewCellStyle20.Font = new System.Drawing.Font("Century", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle20.ForeColor = System.Drawing.Color.White;
+			dataGridViewCellStyle20.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+			dataGridViewCellStyle20.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+			dataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.reporte.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle20;
 			this.reporte.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.reporte.EnableHeadersVisualStyles = false;
-			this.reporte.Location = new System.Drawing.Point(23, 67);
+			this.reporte.Location = new System.Drawing.Point(6, 67);
 			this.reporte.Name = "reporte";
 			this.reporte.ReadOnly = true;
 			this.reporte.RowHeadersVisible = false;
 			this.reporte.RowHeadersWidth = 51;
-			dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(229)))), ((int)(((byte)(116)))));
-			dataGridViewCellStyle6.Font = new System.Drawing.Font("Lucida Fax", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle6.ForeColor = System.Drawing.Color.Navy;
-			this.reporte.RowsDefaultCellStyle = dataGridViewCellStyle6;
+			dataGridViewCellStyle21.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(229)))), ((int)(((byte)(116)))));
+			dataGridViewCellStyle21.Font = new System.Drawing.Font("Lucida Fax", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle21.ForeColor = System.Drawing.Color.Navy;
+			this.reporte.RowsDefaultCellStyle = dataGridViewCellStyle21;
 			this.reporte.RowTemplate.Height = 24;
 			this.reporte.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.reporte.Size = new System.Drawing.Size(1154, 271);
+			this.reporte.Size = new System.Drawing.Size(1277, 271);
 			this.reporte.TabIndex = 20;
+			this.reporte.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.reporte_CellDoubleClick);
 			// 
 			// BtnPrintTicket
 			// 
 			this.BtnPrintTicket.Font = new System.Drawing.Font("Century", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.BtnPrintTicket.Location = new System.Drawing.Point(628, 361);
+			this.BtnPrintTicket.Location = new System.Drawing.Point(493, 361);
 			this.BtnPrintTicket.Name = "BtnPrintTicket";
 			this.BtnPrintTicket.Size = new System.Drawing.Size(342, 42);
 			this.BtnPrintTicket.TabIndex = 16;
@@ -184,7 +193,7 @@ namespace Ticket_bonito
 			this.tabPage2.Location = new System.Drawing.Point(4, 35);
 			this.tabPage2.Name = "tabPage2";
 			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(1204, 443);
+			this.tabPage2.Size = new System.Drawing.Size(1289, 443);
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "Reporte por vendedor";
 			// 
@@ -256,14 +265,77 @@ namespace Ticket_bonito
 			this.label2.TabIndex = 0;
 			this.label2.Text = "Vendedor";
 			// 
+			// tabPage3
+			// 
+			this.tabPage3.BackColor = System.Drawing.Color.Linen;
+			this.tabPage3.Controls.Add(this.button1);
+			this.tabPage3.Controls.Add(this.label6);
+			this.tabPage3.Controls.Add(this.cmbVendedorChange);
+			this.tabPage3.Controls.Add(this.label5);
+			this.tabPage3.Controls.Add(this.textBox1);
+			this.tabPage3.Location = new System.Drawing.Point(4, 35);
+			this.tabPage3.Name = "tabPage3";
+			this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage3.Size = new System.Drawing.Size(1289, 443);
+			this.tabPage3.TabIndex = 2;
+			this.tabPage3.Text = "Cambiar chofer a nota";
+			// 
+			// textBox1
+			// 
+			this.textBox1.Font = new System.Drawing.Font("Century", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textBox1.Location = new System.Drawing.Point(259, 138);
+			this.textBox1.Name = "textBox1";
+			this.textBox1.Size = new System.Drawing.Size(215, 28);
+			this.textBox1.TabIndex = 18;
+			this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
+			// 
+			// label5
+			// 
+			this.label5.AutoSize = true;
+			this.label5.Font = new System.Drawing.Font("Century", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label5.Location = new System.Drawing.Point(197, 141);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(55, 23);
+			this.label5.TabIndex = 19;
+			this.label5.Text = "Folio";
+			// 
+			// cmbVendedorChange
+			// 
+			this.cmbVendedorChange.FormattingEnabled = true;
+			this.cmbVendedorChange.Location = new System.Drawing.Point(638, 136);
+			this.cmbVendedorChange.Name = "cmbVendedorChange";
+			this.cmbVendedorChange.Size = new System.Drawing.Size(608, 31);
+			this.cmbVendedorChange.TabIndex = 20;
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Font = new System.Drawing.Font("Century", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label6.Location = new System.Drawing.Point(550, 139);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(72, 23);
+			this.label6.TabIndex = 21;
+			this.label6.Text = "Chofer";
+			// 
+			// button1
+			// 
+			this.button1.Location = new System.Drawing.Point(426, 214);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(226, 45);
+			this.button1.TabIndex = 22;
+			this.button1.Text = "Actualizar chofer";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
 			// FrmPrincipal
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(252)))), ((int)(((byte)(145)))), ((int)(((byte)(58)))));
-			this.ClientSize = new System.Drawing.Size(1236, 506);
+			this.ClientSize = new System.Drawing.Size(1321, 506);
 			this.Controls.Add(this.TabPages);
 			this.Name = "FrmPrincipal";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Imprimir tickets";
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.TabPages.ResumeLayout(false);
@@ -272,6 +344,8 @@ namespace Ticket_bonito
 			((System.ComponentModel.ISupportInitialize)(this.reporte)).EndInit();
 			this.tabPage2.ResumeLayout(false);
 			this.tabPage2.PerformLayout();
+			this.tabPage3.ResumeLayout(false);
+			this.tabPage3.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -294,6 +368,12 @@ namespace Ticket_bonito
 		private DateTimePicker dateTimePicker3;
 		private Button BtnPrintReport;
 		private DateTimePicker dateTimePicker4;
+		private TabPage tabPage3;
+		private Label label5;
+		private TextBox textBox1;
+		private Label label6;
+		private ComboBox cmbVendedorChange;
+		private Button button1;
 	}
 }
 

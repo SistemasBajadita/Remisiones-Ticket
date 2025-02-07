@@ -21,7 +21,7 @@ namespace Ticket_bonito
 				MySqlCommand cmd = new MySqlCommand(query, con);
 				var rd = cmd.ExecuteScalar();
 
-				if (rd!=null)
+				if (rd != null)
 				{
 					con.Close();
 					return rd.ToString();
@@ -87,6 +87,21 @@ namespace Ticket_bonito
 			}
 
 			return "";
+		}
+
+		public void UpdateChofer(string chofer, string folio)
+		{
+			try
+			{
+				con.Open();
+				cmd = con.CreateCommand();
+				cmd.CommandText = $"update tblrenventas set cod_ven='{chofer}' where ref_doc='{folio}';";
+				cmd.ExecuteNonQuery();
+			}
+			catch (MySqlException ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
 		}
 
 	}
