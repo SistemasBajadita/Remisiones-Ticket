@@ -506,26 +506,101 @@ namespace Ticket_bonito
 
 		private void textBox1_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode == Keys.Enter)
+			if (e.KeyCode == Keys.Enter && TxtFolioChofer.Text != "")
 			{
-				var caja = conn.GetValueFromDataBase($"select caja_doc from tblgralventas where ref_doc='{textBox1.Text}'");
+				var caja = conn.GetValueFromDataBase($"select caja_doc from tblgralventas where ref_doc='{TxtFolioChofer.Text}'");
 
 				if (caja == "9")
 				{
-					var vendedor = conn.GetValueFromDataBase($"select cod_ven from tblrenventas where ref_doc='{textBox1.Text}'");
+					var vendedor = conn.GetValueFromDataBase($"select cod_ven from tblrenventas where ref_doc='{TxtFolioChofer.Text}'");
 
 					cmbVendedorChange.SelectedValue = vendedor;
 				}
 				else
 				{
-					MessageBox.Show("No se pueden actualizar tickets de otras cajas, solo de la caja de remisiones");
+					MessageBox.Show("No se pueden actualizar tickets de otras cajas, solo de la caja de remisiones", "OJO!",
+						MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					TxtFolioChofer.Text = "";
 				}
 			}
 		}
 
-		private void button1_Click(object sender, EventArgs e)
+		private async void BtnUpdateChofer_Click(object sender, EventArgs e)
 		{
-			conn.UpdateChofer(cmbVendedorChange.SelectedValue.ToString(), textBox1.Text);
+			bool result = await conn.UpdateChofer(cmbVendedorChange.SelectedValue.ToString(), TxtFolioChofer.Text);
+
+			if (result)
+			{
+				lblChoferUpdate.Text = "Ticket actualizado exitosamente";
+				lblChoferUpdate.BackColor = System.Drawing.Color.Green;
+				lblChoferUpdate.ForeColor = System.Drawing.Color.White;
+
+				await Task.Delay(3000);
+
+				lblChoferUpdate.Text = "";
+				TxtFolioChofer.Text = "";
+				cmbVendedorChange.Text = "";
+
+			}
+			else
+			{
+				lblChoferUpdate.Text = "Ocurrio un error al intentar actualizar el ticket, vuelve a intentarlo";
+				lblChoferUpdate.BackColor = System.Drawing.Color.Red;
+				lblChoferUpdate.ForeColor = System.Drawing.Color.White;
+
+				await Task.Delay(3000);
+
+				lblChoferUpdate.Text = "";
+			}
+		}
+
+		private void TxtFolioNota_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				var caja = conn.GetValueFromDataBase($"select caja_doc from tblgralventas where ref_doc='{TxtFolioNota.Text}'");
+
+				if (caja == "9")
+				{
+					var nota = conn.GetValueFromDataBase($"select nota from tblgralventas where ref_doc='{TxtFolioNota.Text}'");
+
+					TxtNota.Text = nota;
+				}
+				else
+				{
+					MessageBox.Show("No se pueden actualizar tickets de otras cajas, solo de la caja de remisiones", "OJO!",
+						MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					TxtFolioChofer.Text = "";
+				}
+			}
+		}
+
+		private async void BtnUpdateNota_Click(object sender, EventArgs e)
+		{
+			bool result = await conn.UpdateNota(TxtNota.Text, TxtFolioNota.Text);
+
+			if (result)
+			{
+				lblNota.Text = "Nota actualizada exitosamente";
+				lblNota.BackColor = System.Drawing.Color.Green;
+				lblNota.ForeColor = System.Drawing.Color.White;
+
+				await Task.Delay(3000);
+
+				lblNota.Text = "";
+				TxtFolioNota.Text = "";
+				TxtNota.Text = "";
+			}
+			else
+			{
+				lblNota.Text = "Ocurrio un error al actualizar la nota, intente de nuevo";
+				lblNota.BackColor = System.Drawing.Color.Red;
+				lblNota.ForeColor = System.Drawing.Color.White;
+
+				await Task.Delay(3000);
+
+				lblNota.Text = "";
+			}
 		}
 	}
 }

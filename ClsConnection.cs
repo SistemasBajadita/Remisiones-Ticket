@@ -75,32 +75,54 @@ namespace Ticket_bonito
 
 				object result = cmd.ExecuteScalar();
 
+				con.Close();
+
 				return result.ToString();
 			}
 			catch (MySqlException ex)
 			{
 				MessageBox.Show(ex.Message);
-			}
-			finally
-			{
 				con.Close();
 			}
 
 			return "";
 		}
 
-		public void UpdateChofer(string chofer, string folio)
+		public async Task<bool> UpdateChofer(string chofer, string folio)
 		{
 			try
 			{
-				con.Open();
+				await con.OpenAsync();
 				cmd = con.CreateCommand();
 				cmd.CommandText = $"update tblrenventas set cod_ven='{chofer}' where ref_doc='{folio}';";
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync();
+				await con.CloseAsync();
+				return true;
 			}
 			catch (MySqlException ex)
 			{
 				MessageBox.Show(ex.Message);
+				await con.CloseAsync();
+				return false;
+			}
+		}
+
+		public async Task<bool> UpdateNota(string nota, string folio)
+		{
+			try
+			{
+				await con.OpenAsync();
+				cmd = con.CreateCommand();
+				cmd.CommandText = $"update tblgralventas set nota='{nota}' where ref_doc='{folio}'";
+				await cmd.ExecuteNonQueryAsync();
+				await con.CloseAsync();
+				return true;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+				await con.CloseAsync();
+				return false;
 			}
 		}
 
