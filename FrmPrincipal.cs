@@ -48,15 +48,10 @@ namespace Ticket_bonito
 							  where CAJA_DOC=9 and (ven.fec_doc like '%{filter}%' or ven.ref_doc like '%{filter}%' or nom_cli like '%{filter}%' or ven.hora_reg like '%{filter}%' or TOT_DOC like '%{filter}%') 
 							  and (ven.fec_doc between '{dateA}' and '{dateB}');";
 
-			await Task.Run(async () =>
-			{
-				DataTable temp = await conn.GetTicketsHeader(query);
+			DataTable temp = await conn.GetTicketsHeader(query);
 
-				Invoke(new Action(() =>
-				{
-					reporte.DataSource = temp;
-				}));
-			});
+			reporte.DataSource = temp;
+			CountTickets(temp.Rows.Count);
 		}
 
 		private async void GeneratePdf()
@@ -243,31 +238,29 @@ namespace Ticket_bonito
 			GeneratePdf();
 		}
 
-		private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+		//Este evento esta asignado a ambos dateTimePickers
+		private async void dateTimePicker1_ValueChanged(object sender, EventArgs e)
 		{
-			Task.Run(async () =>
-			{
-				conn = new ClsConnection(ConfigurationManager.ConnectionStrings["servidor"].ToString());
-				DataTable rep = await conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado' ELSE 'Aplicado' END AS Estado" +
-					$" from tblgralventas ven " +
-					$"inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI " +
-					$" inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC " +
-					$"inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP " +
-					$" left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc " +
-					$"where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}' ");
-				Invoke(new Action(() =>
-				{
-					reporte.DataSource = rep;
-				}));
-			});
+			conn = new ClsConnection(ConfigurationManager.ConnectionStrings["servidor"].ToString());
+			DataTable rep = await conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado' ELSE 'Aplicado' END AS Estado" +
+				$" from tblgralventas ven " +
+				$"inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI " +
+				$" inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC " +
+				$"inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP " +
+				$" left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc " +
+				$"where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}' ");
+
+			reporte.DataSource = rep;
+			CountTickets(rep.Rows.Count);
+
 		}
 
 		private async void Form1_Load(object sender, EventArgs e)
 		{
+			BtnUpdateTickets.Enabled = false;
+			reporte.DataSource = null;
 			label1.Visible = true;
-			await Task.Run(async () =>
-			{
-				DataTable result = await conn.GetTicketsHeader($@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE 
+			DataTable result = await conn.GetTicketsHeader($@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE 
 																							   WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado'
 																							   ELSE 'Aplicado'
 																						   END AS Estado
@@ -277,18 +270,15 @@ namespace Ticket_bonito
 																						inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP
 																						left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc
 																						where CAJA_DOC=9 and ven.fec_doc='{DateTime.Now:yyyy-MM-dd}'");
-				Invoke(new Action(() =>
-				{
-					reporte.DataSource = result;
-				}));
-			});
+			reporte.DataSource = result;
+
+			CountTickets(result.Rows.Count);
+
 			label1.Visible = false;
 
 			cmbVendedor.Enabled = false;
 
-			DataTable vendedores = new DataTable();
-
-			await Task.Run(async () => vendedores = await conn.GetTicketsHeader("select cod_ven, nom_ven from tblvendedores;"));
+			DataTable vendedores = await conn.GetTicketsHeader("select cod_ven, nom_ven from tblvendedores;");
 
 			cmbVendedor.DataSource = vendedores;
 			cmbVendedor.DisplayMember = "nom_ven";
@@ -298,8 +288,14 @@ namespace Ticket_bonito
 			cmbVendedorChange.DisplayMember = "nom_ven";
 			cmbVendedorChange.ValueMember = "cod_ven";
 
-
 			cmbVendedor.Enabled = true;
+
+			BtnUpdateTickets.Enabled = true;
+		}
+
+		private void CountTickets(int num)
+		{
+			lblTIcketCount.Text = $"Numero de tickets: {num}";
 		}
 
 		private string GetSelectedTextFromCombo()
@@ -319,23 +315,22 @@ namespace Ticket_bonito
 
 		private async void BtnPrintReport_Click(object sender, EventArgs e)
 		{
-			DataTable tickets = new DataTable();
 			string cod = cmbVendedor.SelectedValue.ToString();
 			string fechaA = dateTimePicker3.Value.ToString("yyyy-MM-dd");
 			string fechaB = dateTimePicker4.Value.ToString("yyyy-MM-dd");
 
-			await Task.Run(async () => tickets = await conn.GetTicketsHeader($@"select DISTINCT ven.fec_doc, ven.ref_doc, cli.NOM_CLI, hora_reg, round(tot_doc,2), ven.COD_USU, ren.cod_ven
+			DataTable tickets = await conn.GetTicketsHeader($@"select DISTINCT ven.fec_doc, ven.ref_doc, cli.NOM_CLI, hora_reg, round(tot_doc,2), ven.COD_USU, ren.cod_ven
 												                    from tblgralventas ven
 												                    inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI
 												                    inner join tblrenventas ren on ren.REF_DOC=ven.REF_DOC
 												                    where CAJA_DOC=9 
 												                    and (ven.FEC_DOC between '{fechaA}' and '{fechaB}')
-												                    and ren.cod_ven='{cod}';"));
+												                    and ren.cod_ven='{cod}';");
 
 			try
 			{
 				Document doc = new Document();
-				string pdfPath = "reporte.pdf";
+				string pdfPath = "reporte de venta.pdf";
 
 				using (FileStream fs = new FileStream(pdfPath, FileMode.Create, FileAccess.Write, FileShare.None))
 				{
@@ -484,7 +479,7 @@ namespace Ticket_bonito
 
 					doc.Close();
 					writer.Close();
-					Process.Start("reporte.pdf");
+					Process.Start(pdfPath);
 				}
 			}
 			catch (Exception ex)
@@ -506,6 +501,11 @@ namespace Ticket_bonito
 
 		private void textBox1_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.KeyCode == Keys.OemOpenBrackets)
+			{
+				e.SuppressKeyPress = true;
+				return;
+			}
 			if (e.KeyCode == Keys.Enter && TxtFolioChofer.Text != "")
 			{
 				var caja = conn.GetValueFromDataBase($"select caja_doc from tblgralventas where ref_doc='{TxtFolioChofer.Text}'");
@@ -539,7 +539,6 @@ namespace Ticket_bonito
 
 				lblChoferUpdate.Text = "";
 				TxtFolioChofer.Text = "";
-				cmbVendedorChange.Text = "";
 
 			}
 			else
@@ -600,6 +599,20 @@ namespace Ticket_bonito
 				await Task.Delay(3000);
 
 				lblNota.Text = "";
+			}
+		}
+
+		private void BtnUpdateTickets_Click(object sender, EventArgs e)
+		{
+			Form1_Load(sender, e);
+		}
+
+		private void TxtFiltro_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.OemOpenBrackets)
+			{
+				e.SuppressKeyPress = true;
+				return;
 			}
 		}
 	}

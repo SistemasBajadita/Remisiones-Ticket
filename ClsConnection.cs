@@ -101,7 +101,7 @@ namespace Ticket_bonito
 			}
 			catch (MySqlException ex)
 			{
-				MessageBox.Show(ex.Message);
+				MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				await con.CloseAsync();
 				return false;
 			}
@@ -118,9 +118,9 @@ namespace Ticket_bonito
 				await con.CloseAsync();
 				return true;
 			}
-			catch (Exception ex)
+			catch (MySqlException ex)
 			{
-				MessageBox.Show(ex.Message);
+				MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				await con.CloseAsync();
 				return false;
 			}
