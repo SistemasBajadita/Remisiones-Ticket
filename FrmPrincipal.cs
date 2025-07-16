@@ -152,7 +152,7 @@ namespace Ticket_bonito
 						doc.Add(new Paragraph("\n"));
 
 						query = $@"
-							select ren.cod1_art, round(can_art, 2),  cat.DES1_ART, concat('$',round(pcio_ven,2)), concat('$', round( can_art*pcio_ven,2))
+							select ren.cod1_art, round(can_art, 2),  cat.DES1_ART, concat('$',round(pcio_ven,2)), concat('$', round( can_art*pcio_ven,2)), ren.cod_und
 							from tblrenventas ren
 							inner join tblcatarticulos cat on cat.cod1_art=ren.cod1_art
 							where ref_doc='{row.Cells[1].Value}';";
@@ -187,7 +187,7 @@ namespace Ticket_bonito
 							ticket_pdf.AddCell(dataCell);
 							dataCell = new PdfPCell(new Phrase($"{r[1]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"{r[2]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+							dataCell = new PdfPCell(new Phrase($"{r[2]}  ({r[5]})", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
 							dataCell = new PdfPCell(new Phrase($"{r[3]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
@@ -269,7 +269,7 @@ namespace Ticket_bonito
 																						inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC
 																						inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP
 																						left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc
-																						where CAJA_DOC=9 and ven.fec_doc='{DateTime.Now:yyyy-MM-dd}'");
+																						where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value.ToString("yyyy-MM-dd")}' and '{dateTimePicker2.Value.ToString("yyyy-MM-dd")}'");
 			reporte.DataSource = result;
 
 			CountTickets(result.Rows.Count);

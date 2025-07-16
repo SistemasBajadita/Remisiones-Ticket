@@ -87,7 +87,7 @@ namespace Ticket_bonito
 			this.TabPages.Location = new System.Drawing.Point(12, 12);
 			this.TabPages.Name = "TabPages";
 			this.TabPages.SelectedIndex = 0;
-			this.TabPages.Size = new System.Drawing.Size(1297, 498);
+			this.TabPages.Size = new System.Drawing.Size(1297, 519);
 			this.TabPages.TabIndex = 0;
 			// 
 			// tabPage1
@@ -104,7 +104,7 @@ namespace Ticket_bonito
 			this.tabPage1.Location = new System.Drawing.Point(4, 35);
 			this.tabPage1.Name = "tabPage1";
 			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(1289, 459);
+			this.tabPage1.Size = new System.Drawing.Size(1289, 480);
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "Imprimir ticket";
 			// 
@@ -112,7 +112,7 @@ namespace Ticket_bonito
 			// 
 			this.lblTIcketCount.AutoSize = true;
 			this.lblTIcketCount.Font = new System.Drawing.Font("Century", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.lblTIcketCount.Location = new System.Drawing.Point(6, 383);
+			this.lblTIcketCount.Location = new System.Drawing.Point(6, 408);
 			this.lblTIcketCount.Name = "lblTIcketCount";
 			this.lblTIcketCount.Size = new System.Drawing.Size(151, 21);
 			this.lblTIcketCount.TabIndex = 23;
@@ -121,7 +121,7 @@ namespace Ticket_bonito
 			// BtnUpdateTickets
 			// 
 			this.BtnUpdateTickets.Font = new System.Drawing.Font("Century", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.BtnUpdateTickets.Location = new System.Drawing.Point(1145, 386);
+			this.BtnUpdateTickets.Location = new System.Drawing.Point(1145, 402);
 			this.BtnUpdateTickets.Name = "BtnUpdateTickets";
 			this.BtnUpdateTickets.Size = new System.Drawing.Size(138, 34);
 			this.BtnUpdateTickets.TabIndex = 22;
@@ -134,7 +134,7 @@ namespace Ticket_bonito
 			// 
 			this.label1.AutoSize = true;
 			this.label1.Font = new System.Drawing.Font("Century", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(94, 415);
+			this.label1.Location = new System.Drawing.Point(94, 440);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(145, 21);
 			this.label1.TabIndex = 21;
@@ -193,7 +193,7 @@ namespace Ticket_bonito
 			this.reporte.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
 			this.reporte.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.reporte.EnableHeadersVisualStyles = false;
-			this.reporte.Location = new System.Drawing.Point(6, 75);
+			this.reporte.Location = new System.Drawing.Point(6, 67);
 			this.reporte.Name = "reporte";
 			this.reporte.ReadOnly = true;
 			this.reporte.RowHeadersVisible = false;
@@ -204,14 +204,14 @@ namespace Ticket_bonito
 			this.reporte.RowsDefaultCellStyle = dataGridViewCellStyle3;
 			this.reporte.RowTemplate.Height = 24;
 			this.reporte.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.reporte.Size = new System.Drawing.Size(1277, 305);
+			this.reporte.Size = new System.Drawing.Size(1277, 324);
 			this.reporte.TabIndex = 20;
 			this.reporte.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.reporte_CellDoubleClick);
 			// 
 			// BtnPrintTicket
 			// 
 			this.BtnPrintTicket.Font = new System.Drawing.Font("Century", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.BtnPrintTicket.Location = new System.Drawing.Point(493, 403);
+			this.BtnPrintTicket.Location = new System.Drawing.Point(493, 428);
 			this.BtnPrintTicket.Name = "BtnPrintTicket";
 			this.BtnPrintTicket.Size = new System.Drawing.Size(342, 42);
 			this.BtnPrintTicket.TabIndex = 16;
@@ -232,7 +232,7 @@ namespace Ticket_bonito
 			this.tabPage2.Location = new System.Drawing.Point(4, 35);
 			this.tabPage2.Name = "tabPage2";
 			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(1289, 443);
+			this.tabPage2.Size = new System.Drawing.Size(1289, 459);
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "Reporte por vendedor";
 			// 
@@ -317,7 +317,7 @@ namespace Ticket_bonito
 			this.tabPage3.Location = new System.Drawing.Point(4, 35);
 			this.tabPage3.Name = "tabPage3";
 			this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage3.Size = new System.Drawing.Size(1289, 443);
+			this.tabPage3.Size = new System.Drawing.Size(1289, 459);
 			this.tabPage3.TabIndex = 2;
 			this.tabPage3.Text = "Cambiar chofer a remision";
 			// 
@@ -400,7 +400,7 @@ namespace Ticket_bonito
 			this.tabPage4.Location = new System.Drawing.Point(4, 35);
 			this.tabPage4.Name = "tabPage4";
 			this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage4.Size = new System.Drawing.Size(1289, 443);
+			this.tabPage4.Size = new System.Drawing.Size(1289, 459);
 			this.tabPage4.TabIndex = 3;
 			this.tabPage4.Text = "Cambiar nota de remision";
 			// 
@@ -475,7 +475,7 @@ namespace Ticket_bonito
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(252)))), ((int)(((byte)(145)))), ((int)(((byte)(58)))));
-			this.ClientSize = new System.Drawing.Size(1321, 522);
+			this.ClientSize = new System.Drawing.Size(1321, 543);
 			this.Controls.Add(this.TabPages);
 			this.Name = "FrmPrincipal";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
