@@ -36,8 +36,8 @@ namespace Ticket_bonito
 			string filter = TxtFiltro.Text;
 			string dateA = dateTimePicker1.Value.ToString("yyyy-MM-dd");
 			string dateB = dateTimePicker2.Value.ToString("yyyy-MM-dd");
-			string query = $@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Folio,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago,CASE 
-								   WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado'
+			string query = $@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Folio,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(dev.tot_dev, 0),2)) as Total, frm.des_frp as Pago,CASE 
+								   WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado'
 								   ELSE 'Aplicado'
 							   END AS Estado
 							  from tblgralventas ven
@@ -80,8 +80,10 @@ namespace Ticket_bonito
 						doc.Add(new Paragraph("                         CURLANGO RAMOS CHRISTIAN YARELY \n" +
 							"                         R.F.C CURC890920PW1", titleFont)
 						{ Alignment = Element.ALIGN_LEFT });
-						Paragraph title = new Paragraph("                         LA BAJADITA - VENTA DE FRUTAS Y VERDURAS", titleFont);
-						title.Alignment = Element.ALIGN_LEFT;
+						Paragraph title = new Paragraph("                         LA BAJADITA - VENTA DE FRUTAS Y VERDURAS", titleFont)
+						{
+							Alignment = Element.ALIGN_LEFT
+						};
 						doc.Add(title);
 						doc.Add(new Paragraph("                         CALLE AVENIDA DE LOS MAESTROS #42 LOCAL 10", titleFont) { Alignment = Element.ALIGN_LEFT });
 						doc.Add(new Paragraph("                         COL. JARDINES DEL BOSQUE", titleFont) { Alignment = Element.ALIGN_LEFT });
@@ -89,8 +91,10 @@ namespace Ticket_bonito
 
 						doc.Add(new Paragraph("\n"));
 
-						PdfPTable table = new PdfPTable(3);
-						table.WidthPercentage = 100;
+						PdfPTable table = new PdfPTable(3)
+						{
+							WidthPercentage = 100
+						};
 
 						float[] columnWidths = new float[] { 1f, 1f, 1f };
 						table.SetWidths(columnWidths);
@@ -151,11 +155,12 @@ namespace Ticket_bonito
 
 						doc.Add(new Paragraph("\n"));
 
-						query = $@"
-							select ren.cod1_art, round(can_art, 2),  cat.DES1_ART, concat('$',round(pcio_ven,2)), concat('$', round( can_art*pcio_ven,2)), ren.cod_und
-							from tblrenventas ren
-							inner join tblcatarticulos cat on cat.cod1_art=ren.cod1_art
-							where ref_doc='{row.Cells[1].Value}';";
+						query = $@"select ren.cod1_art, round(ren.can_art - coalesce(devr.can_dev, 0), 2),  cat.DES1_ART, concat('$',round(pcio_ven,2)), concat('$', round((can_art*pcio_ven) - coalesce((devr.can_dev*devr.pcio_art),0),2)), ren.cod_und
+									from tblrenventas ren
+									inner join tblcatarticulos cat on cat.cod1_art=ren.cod1_art
+									left join tblencdevolucion dev on dev.REF_DOC=ren.REF_DOC
+									left join tblrendevolucion devr on devr.FOL_DEV=dev.FOL_DEV and ren.COD1_ART=devr.cod1_Art
+									where ren.ref_doc='{row.Cells[1].Value}';";
 
 						DataTable ticket = new DataTable();
 
@@ -183,6 +188,10 @@ namespace Ticket_bonito
 
 						foreach (DataRow r in ticket.Rows)
 						{
+							if (double.Parse(r[1].ToString()) == 0){
+								continue;
+							}
+
 							dataCell = new PdfPCell(new Phrase($"{r[0]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
 							dataCell = new PdfPCell(new Phrase($"{r[1]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
@@ -198,13 +207,13 @@ namespace Ticket_bonito
 						doc.Add(ticket_pdf);
 
 
-						query = $"select round(sub_doc,2) from tblgralventas where ref_doc='{row.Cells[1].Value}'";
+						query = $"select round(gral.sub_doc - coalesce(dev.sub_dev, 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.REF_DOC=gral.ref_doc where gral.ref_doc='{row.Cells[1].Value}'";
 						string subtotal = conn.GetValueFromDataBase(query);
 
-						query = $"select round(iva_doc,2) from tblgralventas where ref_doc='{row.Cells[1].Value}'";
+						query = $"select round(gral.iva_doc - coalesce(dev.iva_dev, 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.ref_doc=gral.REF_DOC where gral.ref_doc='{row.Cells[1].Value}'";
 						string impuesto = conn.GetValueFromDataBase(query);
 
-						query = $"select round(tot_doc,2) from tblgralventas where ref_doc='{row.Cells[1].Value}'";
+						query = $"select round(gral.tot_doc - coalesce(dev.tot_dev, 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.ref_doc=gral.ref_doc where gral.ref_doc='{row.Cells[1].Value}'";
 						string total = conn.GetValueFromDataBase(query);
 
 						query = $"select ven.NOM_VEN from tblrenventas ren inner join tblvendedores ven on ven.cod_ven = ren.cod_ven where ref_doc='{row.Cells[1].Value}' limit 1;";
@@ -242,7 +251,7 @@ namespace Ticket_bonito
 		private async void dateTimePicker1_ValueChanged(object sender, EventArgs e)
 		{
 			conn = new ClsConnection(ConfigurationManager.ConnectionStrings["servidor"].ToString());
-			DataTable rep = await conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado' ELSE 'Aplicado' END AS Estado" +
+			DataTable rep = await conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(dev.tot_dev, 0),2)) as Total, frm.des_frp as Pago, CASE WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado' ELSE 'Aplicado' END AS Estado" +
 				$" from tblgralventas ven " +
 				$"inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI " +
 				$" inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC " +
@@ -260,8 +269,8 @@ namespace Ticket_bonito
 			BtnUpdateTickets.Enabled = false;
 			reporte.DataSource = null;
 			label1.Visible = true;
-			DataTable result = await conn.GetTicketsHeader($@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc,2)) as Total, frm.des_frp as Pago, CASE 
-																							   WHEN dev.ref_doc IS NOT NULL AND dev.cod_sts = 5 THEN 'Cancelado'
+			DataTable result = await conn.GetTicketsHeader($@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(dev.tot_dev, 0),2)) as Total, frm.des_frp as Pago, CASE 
+																							   WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado'
 																							   ELSE 'Aplicado'
 																						   END AS Estado
 																						from tblgralventas ven 
@@ -269,7 +278,7 @@ namespace Ticket_bonito
 																						inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC
 																						inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP
 																						left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc
-																						where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value.ToString("yyyy-MM-dd")}' and '{dateTimePicker2.Value.ToString("yyyy-MM-dd")}'");
+																						where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}'");
 			reporte.DataSource = result;
 
 			CountTickets(result.Rows.Count);
@@ -614,6 +623,11 @@ namespace Ticket_bonito
 				e.SuppressKeyPress = true;
 				return;
 			}
+		}
+
+		private void tabPage1_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }
