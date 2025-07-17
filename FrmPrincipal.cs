@@ -39,6 +39,7 @@ namespace Ticket_bonito
 			string query = $@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Folio,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(sum(dev.tot_dev), 0),2)) as Total, frm.des_frp as Pago,CASE 
 								   WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado'
 									when dev.tot_dev<ven.tot_doc and dev.cod_sts = 5 then 'Devolucion'
+									WHEN ven.sts_doc=3 then 'Facturado'
 								   ELSE 'Aplicado'
 							   END AS Estado
 							  from tblgralventas ven
@@ -260,7 +261,7 @@ namespace Ticket_bonito
 		private async void dateTimePicker1_ValueChanged(object sender, EventArgs e)
 		{
 			conn = new ClsConnection(ConfigurationManager.ConnectionStrings["servidor"].ToString());
-			DataTable rep = await conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(sum(dev.tot_dev), 0),2)) as Total, frm.des_frp as Pago, CASE WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado' when dev.tot_dev<ven.tot_doc and dev.cod_sts = 5 then 'Devolucion' ELSE 'Aplicado' END AS Estado" +
+			DataTable rep = await conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(sum(dev.tot_dev), 0),2)) as Total, frm.des_frp as Pago, CASE WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado' when dev.tot_dev<ven.tot_doc and dev.cod_sts = 5 then 'Devolucion' WHEN ven.sts_doc=3 then 'Facturado' ELSE 'Aplicado' END AS Estado" +
 				$" from tblgralventas ven " +
 				$"inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI " +
 				$" inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC " +
