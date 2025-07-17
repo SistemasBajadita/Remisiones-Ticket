@@ -36,8 +36,9 @@ namespace Ticket_bonito
 			string filter = TxtFiltro.Text;
 			string dateA = dateTimePicker1.Value.ToString("yyyy-MM-dd");
 			string dateB = dateTimePicker2.Value.ToString("yyyy-MM-dd");
-			string query = $@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Folio,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(dev.tot_dev, 0),2)) as Total, frm.des_frp as Pago,CASE 
+			string query = $@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Folio,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(sum(dev.tot_dev), 0),2)) as Total, frm.des_frp as Pago,CASE 
 								   WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado'
+									when dev.tot_dev<ven.tot_doc and dev.cod_sts = 5 then 'Devolucion'
 								   ELSE 'Aplicado'
 							   END AS Estado
 							  from tblgralventas ven
@@ -46,7 +47,8 @@ namespace Ticket_bonito
 						      inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP
 							  left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc
 							  where CAJA_DOC=9 and (ven.fec_doc like '%{filter}%' or ven.ref_doc like '%{filter}%' or nom_cli like '%{filter}%' or ven.hora_reg like '%{filter}%' or TOT_DOC like '%{filter}%') 
-							  and (ven.fec_doc between '{dateA}' and '{dateB}');";
+							  and (ven.fec_doc between '{dateA}' and '{dateB}')
+							group by ven.ref_doc;";
 
 			DataTable temp = await conn.GetTicketsHeader(query);
 
@@ -155,12 +157,13 @@ namespace Ticket_bonito
 
 						doc.Add(new Paragraph("\n"));
 
-						query = $@"select ren.cod1_art, round(ren.can_art - coalesce(devr.can_dev, 0), 2),  cat.DES1_ART, concat('$',round(pcio_ven,2)), concat('$', round((can_art*pcio_ven) - coalesce((devr.can_dev*devr.pcio_art),0),2)), ren.cod_und
+						query = $@"select ren.cod1_art, round(ren.can_art - coalesce(sum(devr.can_dev), 0), 2),  cat.DES1_ART, concat('$',round(pcio_ven,2)), concat('$', round((can_art*pcio_ven) - coalesce(sum(devr.can_dev*devr.pcio_art),0),2)), ren.cod_und
 									from tblrenventas ren
 									inner join tblcatarticulos cat on cat.cod1_art=ren.cod1_art
 									left join tblencdevolucion dev on dev.REF_DOC=ren.REF_DOC
 									left join tblrendevolucion devr on devr.FOL_DEV=dev.FOL_DEV and ren.COD1_ART=devr.cod1_Art
-									where ren.ref_doc='{row.Cells[1].Value}';";
+									where ren.ref_doc='{row.Cells[1].Value}'
+									group by ren.cod1_art;";
 
 						DataTable ticket = new DataTable();
 
@@ -200,20 +203,26 @@ namespace Ticket_bonito
 							ticket_pdf.AddCell(dataCell);
 							dataCell = new PdfPCell(new Phrase($"{r[3]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"{r[4]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+							dataCell = new PdfPCell(new Phrase($"${decimal.Parse(r[4].ToString().Substring(1)):N2}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
 						}
 
 						doc.Add(ticket_pdf);
 
+						query = $"select group_concat(fol_dev Separator ' - ') from tblencdevolucion where ref_doc='{row.Cells[1].Value}'";
+						string devoluciones = conn.GetValueFromDataBase(query);
 
-						query = $"select round(gral.sub_doc - coalesce(dev.sub_dev, 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.REF_DOC=gral.ref_doc where gral.ref_doc='{row.Cells[1].Value}'";
+						if (devoluciones != "")
+							doc.Add(new Paragraph($"Devoluciones relacionadas: {devoluciones}", FontFactory.GetFont(FontFactory.HELVETICA, 8)) );
+
+
+						query = $"select round(gral.sub_doc - coalesce(sum(dev.sub_dev), 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.REF_DOC=gral.ref_doc where gral.ref_doc='{row.Cells[1].Value}' group by gral.ref_doc";
 						string subtotal = conn.GetValueFromDataBase(query);
 
-						query = $"select round(gral.iva_doc - coalesce(dev.iva_dev, 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.ref_doc=gral.REF_DOC where gral.ref_doc='{row.Cells[1].Value}'";
+						query = $"select round(gral.iva_doc - coalesce(sum(dev.iva_dev), 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.ref_doc=gral.REF_DOC where gral.ref_doc='{row.Cells[1].Value}' group by gral.ref_doc";
 						string impuesto = conn.GetValueFromDataBase(query);
 
-						query = $"select round(gral.tot_doc - coalesce(dev.tot_dev, 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.ref_doc=gral.ref_doc where gral.ref_doc='{row.Cells[1].Value}'";
+						query = $"select round(gral.tot_doc - coalesce(sum(dev.tot_dev), 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.ref_doc=gral.ref_doc where gral.ref_doc='{row.Cells[1].Value}' group by gral.ref_doc";
 						string total = conn.GetValueFromDataBase(query);
 
 						query = $"select ven.NOM_VEN from tblrenventas ren inner join tblvendedores ven on ven.cod_ven = ren.cod_ven where ref_doc='{row.Cells[1].Value}' limit 1;";
@@ -251,13 +260,14 @@ namespace Ticket_bonito
 		private async void dateTimePicker1_ValueChanged(object sender, EventArgs e)
 		{
 			conn = new ClsConnection(ConfigurationManager.ConnectionStrings["servidor"].ToString());
-			DataTable rep = await conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(dev.tot_dev, 0),2)) as Total, frm.des_frp as Pago, CASE WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado' ELSE 'Aplicado' END AS Estado" +
+			DataTable rep = await conn.GetTicketsHeader($"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(sum(dev.tot_dev), 0),2)) as Total, frm.des_frp as Pago, CASE WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado' when dev.tot_dev<ven.tot_doc and dev.cod_sts = 5 then 'Devolucion' ELSE 'Aplicado' END AS Estado" +
 				$" from tblgralventas ven " +
 				$"inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI " +
 				$" inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC " +
 				$"inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP " +
 				$" left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc " +
-				$"where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}' ");
+				$"where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}' " +
+				$"group by ven.ref_doc");
 
 			reporte.DataSource = rep;
 			CountTickets(rep.Rows.Count);
@@ -269,8 +279,9 @@ namespace Ticket_bonito
 			BtnUpdateTickets.Enabled = false;
 			reporte.DataSource = null;
 			label1.Visible = true;
-			DataTable result = await conn.GetTicketsHeader($@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(dev.tot_dev, 0),2)) as Total, frm.des_frp as Pago, CASE 
+			DataTable result = await conn.GetTicketsHeader($@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(sum(dev.tot_dev), 0),2)) as Total, frm.des_frp as Pago, CASE 
 																							   WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado'
+																								when dev.tot_dev<ven.tot_doc and dev.cod_sts = 5 then 'Devolucion'
 																							   ELSE 'Aplicado'
 																						   END AS Estado
 																						from tblgralventas ven 
@@ -278,7 +289,8 @@ namespace Ticket_bonito
 																						inner join tblauxcaja aux on aux.REF_DOC=ven.REF_DOC
 																						inner join tblformaspago frm on frm.COD_FRP=aux.COD_FRP
 																						left join tblencdevolucion dev on dev.REF_DOC=ven.ref_doc
-																						where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}'");
+																						where CAJA_DOC=9 and ven.fec_doc between '{dateTimePicker1.Value:yyyy-MM-dd}' and '{dateTimePicker2.Value:yyyy-MM-dd}'
+																						group by ven.ref_doc;");
 			reporte.DataSource = result;
 
 			CountTickets(result.Rows.Count);
