@@ -163,7 +163,7 @@ namespace Ticket_bonito
 									left join tblencdevolucion dev on dev.REF_DOC=ren.REF_DOC
 									left join tblrendevolucion devr on devr.FOL_DEV=dev.FOL_DEV and ren.COD1_ART=devr.cod1_Art
 									where ren.ref_doc='{row.Cells[1].Value}'
-									group by ren.cod1_art;";
+									group by ren.cod1_art, ren.pcio_ven;";
 
 						DataTable ticket = new DataTable();
 
@@ -282,6 +282,7 @@ namespace Ticket_bonito
 			DataTable result = await conn.GetTicketsHeader($@"select distinct ven.fec_doc as Fecha,ven.ref_doc as Ticket,cli.NOM_CLI as Nombre, ven.hora_reg as Hora, concat('$', round(ven.tot_doc - coalesce(sum(dev.tot_dev), 0),2)) as Total, frm.des_frp as Pago, CASE 
 																							   WHEN dev.TOT_DEV=ven.tot_doc AND dev.cod_sts = 5 THEN 'Cancelado'
 																								when dev.tot_dev<ven.tot_doc and dev.cod_sts = 5 then 'Devolucion'
+																								WHEN ven.sts_doc=3 then 'Facturado'
 																							   ELSE 'Aplicado'
 																						   END AS Estado
 																						from tblgralventas ven 
