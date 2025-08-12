@@ -64,6 +64,8 @@ namespace Ticket_bonito
 				// Recorre todas las filas seleccionadas
 				foreach (DataGridViewRow row in reporte.SelectedRows)
 				{
+					string fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fuentes", "Roboto-Regular.ttf");
+
 					string pdfPath = $"ticket_{row.Index}.pdf"; // Nombre de archivo único para cada PDF
 
 					// Generar el PDF para cada fila seleccionada
@@ -158,7 +160,7 @@ namespace Ticket_bonito
 
 						doc.Add(new Paragraph("\n"));
 
-						query = $@"select ren.cod1_art, round(ren.can_art - coalesce(sum(devr.can_dev), 0), 2),  cat.DES1_ART, concat('$',round(pcio_ven,2)), concat('$', round((can_art*pcio_ven) - coalesce(sum(devr.can_dev*devr.pcio_art),0),2)), ren.cod_und
+						query = $@"select ren.cod1_art, round(sum(ren.can_art) - coalesce(sum(devr.can_dev), 0), 2),  cat.DES1_ART, concat('$',round(pcio_ven,2)), concat('$', round((sum(can_art)*pcio_ven) - coalesce(sum(devr.can_dev*devr.pcio_art),0),2)), ren.cod_und
 									from tblrenventas ren
 									inner join tblcatarticulos cat on cat.cod1_art=ren.cod1_art
 									left join tblencdevolucion dev on dev.REF_DOC=ren.REF_DOC
