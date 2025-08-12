@@ -64,7 +64,11 @@ namespace Ticket_bonito
 				// Recorre todas las filas seleccionadas
 				foreach (DataGridViewRow row in reporte.SelectedRows)
 				{
-					string fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fuentes", "Roboto-Regular.ttf");
+					string fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fuentes", "Montserrat-Bold.ttf");
+
+					// Registrar y crear la fuente
+					BaseFont bf = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+					Font customFont = new Font(bf, 12, iTextSharp.text.Font.BOLD, BaseColor.BLACK);
 
 					string pdfPath = $"ticket_{row.Index}.pdf"; // Nombre de archivo único para cada PDF
 
@@ -83,16 +87,16 @@ namespace Ticket_bonito
 						Font titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
 
 						doc.Add(new Paragraph("                         CURLANGO RAMOS CHRISTIAN YARELY \n" +
-							"                         R.F.C CURC890920PW1", titleFont)
+							"                         R.F.C CURC890920PW1", customFont)
 						{ Alignment = Element.ALIGN_LEFT });
-						Paragraph title = new Paragraph("                         LA BAJADITA - VENTA DE FRUTAS Y VERDURAS", titleFont)
+						Paragraph title = new Paragraph("                         LA BAJADITA - VENTA DE FRUTAS Y VERDURAS", customFont)
 						{
 							Alignment = Element.ALIGN_LEFT
 						};
 						doc.Add(title);
-						doc.Add(new Paragraph("                         CALLE AVENIDA DE LOS MAESTROS #42 LOCAL 10", titleFont) { Alignment = Element.ALIGN_LEFT });
-						doc.Add(new Paragraph("                         COL. JARDINES DEL BOSQUE", titleFont) { Alignment = Element.ALIGN_LEFT });
-						doc.Add(new Paragraph("                         C.P. 84063 H. NOGALES, SONORA", titleFont) { Alignment = Element.ALIGN_LEFT });
+						doc.Add(new Paragraph("                         CALLE AVENIDA DE LOS MAESTROS #42 LOCAL 10", customFont) { Alignment = Element.ALIGN_LEFT });
+						doc.Add(new Paragraph("                         COL. JARDINES DEL BOSQUE", customFont) { Alignment = Element.ALIGN_LEFT });
+						doc.Add(new Paragraph("                         C.P. 84063 H. NOGALES, SONORA", customFont) { Alignment = Element.ALIGN_LEFT });
 
 						doc.Add(new Paragraph("\n"));
 
@@ -104,6 +108,8 @@ namespace Ticket_bonito
 						float[] columnWidths = new float[] { 1f, 1f, 1f };
 						table.SetWidths(columnWidths);
 
+						customFont.Size= 10;
+
 						iTextSharp.text.Font headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
 						PdfPCell headerCell;
 
@@ -111,36 +117,38 @@ namespace Ticket_bonito
 						float[] columnWidths_ = new float[] { 3f, 3f, 3f, 1f };
 						table2.SetWidths(columnWidths_);
 
-						headerCell = new PdfPCell(new Phrase($"FECHA: {Convert.ToDateTime(row.Cells[0].Value).ToString("dd/MM/yyyy")}", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase($"FECHA: {Convert.ToDateTime(row.Cells[0].Value).ToString("dd/MM/yyyy")}", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
 						table.AddCell(headerCell);
-						headerCell = new PdfPCell(new Phrase($"FOLIO: {row.Cells[1].Value}", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase($"FOLIO: {row.Cells[1].Value}", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
 						table.AddCell(headerCell);
-						headerCell = new PdfPCell(new Phrase($"CLIENTE: {row.Cells[2].Value}", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase($"CLIENTE: {row.Cells[2].Value}", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
 						table.AddCell(headerCell);
 						doc.Add(table);
+
+						doc.AddTitle($"{row.Cells[2].Value} - {row.Cells[1].Value}");
 
 						string query = $"select cod_cli from tblgralventas where ref_doc='{row.Cells[1].Value}'";
 						string comodin = "";
 						await Task.Run(() => comodin = conn.GetValueFromDataBase(query));
-						headerCell = new PdfPCell(new Phrase($"NO. CLIENTE: {comodin}.", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase($"NO. CLIENTE: {comodin}.", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
 						table2.AddCell(headerCell);
 
 						query = $"select call_num from tblcatclientes c inner join tblgralventas v on v.COD_CLI=c.cod_cli where v.ref_doc='{row.Cells[1].Value}';";
 						comodin = "";
 						await Task.Run(() => comodin = conn.GetValueFromDataBase(query));
-						headerCell = new PdfPCell(new Phrase($"DIRECCION: {comodin}.", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase($"DIRECCION: {comodin}.", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
 						table2.AddCell(headerCell);
 
 						query = $"select col_cli from tblcatclientes c inner join tblgralventas v on v.COD_CLI=c.cod_cli where v.ref_doc='{row.Cells[1].Value}';";
 						comodin = "";
 						await Task.Run(() => comodin = conn.GetValueFromDataBase(query));
-						headerCell = new PdfPCell(new Phrase($"COLONIA: {comodin}.", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase($"COLONIA: {comodin}.", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
 						table2.AddCell(headerCell);
 
 						query = $"select cop_cli from tblcatclientes c inner join tblgralventas v on v.COD_CLI=c.cod_cli where v.ref_doc='{row.Cells[1].Value}';";
 						comodin = "";
 						await Task.Run(() => comodin = conn.GetValueFromDataBase(query));
-						headerCell = new PdfPCell(new Phrase($"CP: {comodin}.", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase($"CP: {comodin}.", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.NO_BORDER, PaddingBottom = 10f };
 						table2.AddCell(headerCell);
 
 						doc.Add(table2);
@@ -175,22 +183,28 @@ namespace Ticket_bonito
 						PdfPCell dataCell;
 						iTextSharp.text.Font dataFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
 
+
+
 						PdfPTable ticket_pdf = new PdfPTable(5);
 						ticket_pdf.WidthPercentage = 100;
 
 						float[] columnWidths_ticket = new float[] { 1f, 1f, 3f, 1f, 1f }; // Ajusta estos valores según sea necesario
 						ticket_pdf.SetWidths(columnWidths_ticket);
 
-						headerCell = new PdfPCell(new Phrase("CODIGO", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase("CODIGO", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 						ticket_pdf.AddCell(headerCell);
-						headerCell = new PdfPCell(new Phrase("CANTIDAD", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase("CANTIDAD", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 						ticket_pdf.AddCell(headerCell);
-						headerCell = new PdfPCell(new Phrase("DESCRIPCION", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase("DESCRIPCION", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 						ticket_pdf.AddCell(headerCell);
-						headerCell = new PdfPCell(new Phrase("PRECIO", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase("PRECIO", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 						ticket_pdf.AddCell(headerCell);
-						headerCell = new PdfPCell(new Phrase("IMPORTE", headerFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+						headerCell = new PdfPCell(new Phrase("IMPORTE", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 						ticket_pdf.AddCell(headerCell);
+
+						fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fuentes", "Montserrat-Regular.ttf");						
+						bf = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+						customFont = new Font(bf, 10, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
 
 						foreach (DataRow r in ticket.Rows)
 						{
@@ -198,15 +212,15 @@ namespace Ticket_bonito
 								continue;
 							}
 
-							dataCell = new PdfPCell(new Phrase($"{r[0]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+							dataCell = new PdfPCell(new Phrase($"{r[0]}", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"{r[1]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+							dataCell = new PdfPCell(new Phrase($"{r[1]}", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"{r[2]}  ({r[5]})", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+							dataCell = new PdfPCell(new Phrase($"{r[2]}  ({r[5]})", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"{r[3]}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+							dataCell = new PdfPCell(new Phrase($"{r[3]}", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
-							dataCell = new PdfPCell(new Phrase($"${decimal.Parse(r[4].ToString().Substring(1)):N2}", dataFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
+							dataCell = new PdfPCell(new Phrase($"${decimal.Parse(r[4].ToString().Substring(1)):N2}", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
 							ticket_pdf.AddCell(dataCell);
 						}
 
