@@ -333,7 +333,7 @@ namespace Ticket_bonito
 
             cmbVendedor.Enabled = false;
 
-            DataTable vendedores = await conn.GetTicketsHeader("select cod_ven, nom_ven from tblvendedores;");
+            DataTable vendedores = await conn.GetTicketsHeader("select cod_ven, nom_ven from tblvendedores where cod_sts=1;");
 
             cmbVendedor.DataSource = vendedores;
             cmbVendedor.DisplayMember = "nom_ven";
