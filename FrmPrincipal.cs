@@ -108,7 +108,7 @@ namespace Ticket_bonito
                         float[] columnWidths = new float[] { 1f, 1f, 1f };
                         table.SetWidths(columnWidths);
 
-                        customFont.Size = 10;
+						customFont.Size = 10;
 
                         iTextSharp.text.Font headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
                         PdfPCell headerCell;
@@ -202,16 +202,15 @@ namespace Ticket_bonito
                         headerCell = new PdfPCell(new Phrase("IMPORTE", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
                         ticket_pdf.AddCell(headerCell);
 
-                        fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fuentes", "Montserrat-Regular.ttf");
-                        bf = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        customFont = new Font(bf, 10, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
+						fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fuentes", "Montserrat-Regular.ttf");						
+						bf = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+						customFont = new Font(bf, 10, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
 
-                        foreach (DataRow r in ticket.Rows)
-                        {
-                            if (double.Parse(r[1].ToString()) == 0)
-                            {
-                                continue;
-                            }
+						foreach (DataRow r in ticket.Rows)
+						{
+							if (double.Parse(r[1].ToString()) == 0){
+								continue;
+							}
 
                             dataCell = new PdfPCell(new Phrase($"{r[0]}", customFont)) { HorizontalAlignment = Element.ALIGN_LEFT, Border = PdfPCell.BOTTOM_BORDER, PaddingBottom = 10f };
                             ticket_pdf.AddCell(dataCell);
@@ -245,8 +244,8 @@ namespace Ticket_bonito
                         query = $"select group_concat(fol_dev Separator ' - ') from tblencdevolucion where ref_doc='{row.Cells[1].Value}'";
                         string devoluciones = conn.GetValueFromDataBase(query);
 
-                        if (devoluciones != "")
-                            doc.Add(new Paragraph($"Devoluciones relacionadas: {devoluciones}", FontFactory.GetFont(FontFactory.HELVETICA, 8)));
+						if (devoluciones != "")
+							doc.Add(new Paragraph($"Devoluciones relacionadas: {devoluciones}", FontFactory.GetFont(FontFactory.HELVETICA, 8)) );
 
 
                         query = $"select round(gral.sub_doc - coalesce(sum(dev.sub_dev), 0),2) from tblgralventas gral left join tblencdevolucion dev on dev.REF_DOC=gral.ref_doc where gral.ref_doc='{row.Cells[1].Value}' group by gral.ref_doc";
@@ -368,13 +367,13 @@ namespace Ticket_bonito
             return null;
         }
 
-        private async void BtnPrintReport_Click(object sender, EventArgs e)
-        {
-            string cod = cmbVendedor.SelectedValue.ToString();
-            string fechaA = dateTimePicker3.Value.ToString("yyyy-MM-dd");
-            string fechaB = dateTimePicker4.Value.ToString("yyyy-MM-dd");
+		private async void BtnPrintReport_Click(object sender, EventArgs e)
+		{
+			string cod = cmbVendedor.SelectedValue.ToString();
+			string fechaA = dateTimePicker3.Value.ToString("yyyy-MM-dd");
+			string fechaB = dateTimePicker4.Value.ToString("yyyy-MM-dd");
 
-            DataTable tickets = await conn.GetTicketsHeader($@"select DISTINCT ven.fec_doc, ven.ref_doc, cli.NOM_CLI, hora_reg, round(tot_doc,2), ven.COD_USU, ren.cod_ven
+			DataTable tickets = await conn.GetTicketsHeader($@"select DISTINCT ven.fec_doc, ven.ref_doc, cli.NOM_CLI, hora_reg, round(tot_doc,2), ven.COD_USU, ren.cod_ven
 												                    from tblgralventas ven
 												                    inner join tblcatclientes cli on cli.COD_Cli=ven.COD_CLI
 												                    inner join tblrenventas ren on ren.REF_DOC=ven.REF_DOC
@@ -532,16 +531,16 @@ namespace Ticket_bonito
 
 
 
-                    doc.Close();
-                    writer.Close();
-                    Process.Start(pdfPath);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "La Bajadita - Venta de Frutas y Verduras");
-            }
-        }
+					doc.Close();
+					writer.Close();
+					Process.Start(pdfPath);
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, "La Bajadita - Venta de Frutas y Verduras");
+			}
+		}
 
         private async void reporte_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {

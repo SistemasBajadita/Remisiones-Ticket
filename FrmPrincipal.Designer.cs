@@ -67,6 +67,8 @@ namespace Ticket_bonito
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.TxtFolioNota = new System.Windows.Forms.TextBox();
+			this.chkNV = new System.Windows.Forms.CheckBox();
+			this.chkPedidos = new System.Windows.Forms.CheckBox();
 			this.TabPages.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.reporte)).BeginInit();
@@ -223,6 +225,8 @@ namespace Ticket_bonito
 			// tabPage2
 			// 
 			this.tabPage2.BackColor = System.Drawing.Color.Linen;
+			this.tabPage2.Controls.Add(this.chkPedidos);
+			this.tabPage2.Controls.Add(this.chkNV);
 			this.tabPage2.Controls.Add(this.BtnPrintReport);
 			this.tabPage2.Controls.Add(this.dateTimePicker4);
 			this.tabPage2.Controls.Add(this.label4);
@@ -471,6 +475,26 @@ namespace Ticket_bonito
 			this.TxtFolioNota.TabIndex = 24;
 			this.TxtFolioNota.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtFolioNota_KeyDown);
 			// 
+			// chkNV
+			// 
+			this.chkNV.AutoSize = true;
+			this.chkNV.Location = new System.Drawing.Point(301, 199);
+			this.chkNV.Name = "chkNV";
+			this.chkNV.Size = new System.Drawing.Size(174, 27);
+			this.chkNV.TabIndex = 7;
+			this.chkNV.Text = "Notas de Venta";
+			this.chkNV.UseVisualStyleBackColor = true;
+			// 
+			// chkPedidos
+			// 
+			this.chkPedidos.AutoSize = true;
+			this.chkPedidos.Location = new System.Drawing.Point(481, 199);
+			this.chkPedidos.Name = "chkPedidos";
+			this.chkPedidos.Size = new System.Drawing.Size(102, 27);
+			this.chkPedidos.TabIndex = 8;
+			this.chkPedidos.Text = "Pedidos";
+			this.chkPedidos.UseVisualStyleBackColor = true;
+			// 
 			// FrmPrincipal
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -532,6 +556,8 @@ namespace Ticket_bonito
 		private Label lblNota;
 		private Button BtnUpdateTickets;
 		private Label lblTIcketCount;
+		private CheckBox chkPedidos;
+		private CheckBox chkNV;
 	}
 }
 

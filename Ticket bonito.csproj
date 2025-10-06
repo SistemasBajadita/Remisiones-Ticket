@@ -51,10 +51,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>027EC27E783F6E2B5C5546F5126397B98E3D15D9</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>25C508CE7CD3B50CF060CED88F4045C9A57EAF0A</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Ticket bonito_2_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>Ticket bonito_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -66,7 +66,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>FIRMA 3.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>FIRMA.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
@@ -126,7 +126,7 @@
     <Content Include="Fuentes\Montserrat-Regular.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="FIRMA 3.pfx" />
+    <None Include="FIRMA.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -137,8 +137,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Ticket bonito_1_TemporaryKey.pfx" />
-    <None Include="Ticket bonito_2_TemporaryKey.pfx" />
     <None Include="Ticket bonito_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
